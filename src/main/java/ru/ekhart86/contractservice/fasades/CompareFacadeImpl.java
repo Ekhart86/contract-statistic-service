@@ -3,8 +3,8 @@ package ru.ekhart86.contractservice.fasades;
 import org.springframework.stereotype.Service;
 import ru.ekhart86.contractservice.dao.ProductDao;
 import ru.ekhart86.contractservice.enums.ErrorMessage;
-import ru.ekhart86.contractservice.model.gov.Contract;
-import ru.ekhart86.contractservice.model.gov.MainResponse;
+import ru.ekhart86.contractservice.dto.Contract;
+import ru.ekhart86.contractservice.dto.MainResponse;
 import ru.ekhart86.contractservice.model.response.ComparisonResponse;
 import ru.ekhart86.contractservice.services.ContractService;
 
@@ -26,14 +26,14 @@ public class CompareFacadeImpl implements CompareFacade {
 
     @Override
     public boolean checkProductCode(String productCode) {
-        System.out.println("Продукт в базе данных = " + productDao.getProductByPartCode(productCode).size());
+        System.out.println("Продуктов в базе данных = " + productDao.getProductByPartCode(productCode).size());
         return productDao.getProductByPartCode(productCode).size() > 0;
     }
 
     @Override
     public ComparisonResponse compareByProduct(String productCode, String fromPeriod, String toPeriod) {
-        MainResponse fromDateResponse = contractService.findContractsByOkpd(productCode, fromPeriod);
-        MainResponse toDateResponse = contractService.findContractsByOkpd(productCode, toPeriod);
+        MainResponse fromDateResponse = contractService.findContractsByProduct(productCode, fromPeriod);
+        MainResponse toDateResponse = contractService.findContractsByProduct(productCode, toPeriod);
         if (fromDateResponse != null && toDateResponse != null) {
             int fromDateNumberOfContracts = fromDateResponse.getContracts().getData().size();
             int toDateNumberOfContracts = toDateResponse.getContracts().getData().size();

@@ -1,4 +1,4 @@
-package ru.ekhart86.contractservice.model.gov;
+package ru.ekhart86.contractservice.dto;
 
 import lombok.Data;
 

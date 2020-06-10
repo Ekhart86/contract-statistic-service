@@ -1,9 +1,9 @@
-package ru.ekhart86.contractservice.model.gov;
+package ru.ekhart86.contractservice.dto;
 
 import lombok.Data;
 
 @Data
-public class OKEI {
+public class OKPD2 {
 
     private String code;
 

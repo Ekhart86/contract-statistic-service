@@ -1,7 +1,7 @@
 package ru.ekhart86.contractservice.services;
 
-import ru.ekhart86.contractservice.model.gov.MainResponse;
+import ru.ekhart86.contractservice.dto.MainResponse;
 
 public interface ContractService {
-    MainResponse findContractsByOkpd(String okpd, String date);
+    MainResponse findContractsByProduct(String productCode, String date);
 }
