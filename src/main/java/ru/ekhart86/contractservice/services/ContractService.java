@@ -1,7 +1,7 @@
 package ru.ekhart86.contractservice.services;
 
-import ru.ekhart86.contractservice.dto.MainResponse;
+import ru.ekhart86.contractservice.dto.ContractResponse;
 
 public interface ContractService {
-    MainResponse findContractsByProduct(String productCode, String date);
+    ContractResponse findContractsByProduct(String productCode, String date);
 }

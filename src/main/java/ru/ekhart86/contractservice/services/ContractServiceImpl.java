@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import ru.ekhart86.contractservice.dto.MainResponse;
+import ru.ekhart86.contractservice.dto.ContractResponse;
 
 @Service
 @Data
@@ -22,16 +22,16 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public MainResponse findContractsByProduct(String productCode, String date) {
+    public ContractResponse findContractsByProduct(String productCode, String date) {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder
                 .fromUriString(url + "/search/")
                 .queryParam("okdp_okpd", productCode)
                 .queryParam("daterange", date)
                 .queryParam("sort", "-price");
-        MainResponse mainResponseByOkpd;
+        ContractResponse contractResponseByOkpd;
         try {
-            mainResponseByOkpd = restTemplate.getForEntity(uriBuilder.toUriString(), MainResponse.class).getBody();
-            return mainResponseByOkpd;
+            contractResponseByOkpd = restTemplate.getForEntity(uriBuilder.toUriString(), ContractResponse.class).getBody();
+            return contractResponseByOkpd;
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
                 throw ex;

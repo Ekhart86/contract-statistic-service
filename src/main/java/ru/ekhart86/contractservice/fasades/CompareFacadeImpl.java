@@ -1,23 +1,26 @@
 package ru.ekhart86.contractservice.fasades;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.ekhart86.contractservice.dao.ProductDao;
+import ru.ekhart86.contractservice.dto.ContractResponse;
 import ru.ekhart86.contractservice.enums.ErrorMessage;
-import ru.ekhart86.contractservice.dto.Contract;
-import ru.ekhart86.contractservice.dto.MainResponse;
 import ru.ekhart86.contractservice.model.response.ComparisonResponse;
 import ru.ekhart86.contractservice.services.ContractService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 @Service
 public class CompareFacadeImpl implements CompareFacade {
 
-    private ContractService contractService;
-    private ProductDao productDao;
+    private final Logger logger = LoggerFactory.getLogger(CompareFacadeImpl.class);
+    private final ContractService contractService;
+    private final ProductDao productDao;
 
     public CompareFacadeImpl(ContractService contractService, ProductDao productDao) {
         this.contractService = contractService;
@@ -26,14 +29,13 @@ public class CompareFacadeImpl implements CompareFacade {
 
     @Override
     public boolean checkProductCode(String productCode) {
-        System.out.println("Продуктов в базе данных = " + productDao.getProductByPartCode(productCode).size());
         return productDao.getProductByPartCode(productCode).size() > 0;
     }
 
     @Override
     public ComparisonResponse compareByProduct(String productCode, String fromPeriod, String toPeriod) {
-        MainResponse fromDateResponse = contractService.findContractsByProduct(productCode, fromPeriod);
-        MainResponse toDateResponse = contractService.findContractsByProduct(productCode, toPeriod);
+        ContractResponse fromDateResponse = contractService.findContractsByProduct(productCode, fromPeriod);
+        ContractResponse toDateResponse = contractService.findContractsByProduct(productCode, toPeriod);
         if (fromDateResponse != null && toDateResponse != null) {
             int fromDateNumberOfContracts = fromDateResponse.getContracts().getData().size();
             int toDateNumberOfContracts = toDateResponse.getContracts().getData().size();
@@ -48,22 +50,21 @@ public class CompareFacadeImpl implements CompareFacade {
         }
     }
 
-    private long getAmount(MainResponse response) {
-        double amount = 0.0;
-        for (Contract contract : response.getContracts().getData()) {
+    private long getAmount(ContractResponse response) {
+        var amount = new ArrayList<Double>();
+        response.getContracts().getData().forEach(contract -> {
             try {
-                double temp = Double.parseDouble(contract.getPrice());
-                amount += temp;
+                amount.add(Double.parseDouble(contract.getPrice()));
             } catch (Exception e) {
-                System.out.println("Стоимость указанно некорректно, пропускаем это значение...");
+                logger.info("Стоимость указанна некорректно, пропускаем это значение...");
             }
-        }
-        return (int) amount;
+        });
+        return (int) amount.stream().mapToDouble(Double::doubleValue).sum();
     }
 
     private String compareAmount(long fromDateAmount, long toDateAmount) {
-        System.out.println("Сумма раньше : " + fromDateAmount);
-        System.out.println("Сумма сейчас : " + toDateAmount);
+        logger.info("Сумма контрактов раньше : " + fromDateAmount);
+        logger.info("Сумма контрактов сейчас : " + toDateAmount);
         var builder = new StringBuilder();
         if (fromDateAmount < toDateAmount) {
             return builder.append("Увеличение общей суммы контрактов на ")

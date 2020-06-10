@@ -1,5 +1,6 @@
 package ru.ekhart86.contractservice.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import ru.ekhart86.contractservice.fasades.CompareFacade;
 import ru.ekhart86.contractservice.model.response.ComparisonResponse;
 
 @RestController
+@Slf4j
 public class ContractController {
 
     private CompareFacade compareFacade;
