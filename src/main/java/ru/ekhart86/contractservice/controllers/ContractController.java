@@ -31,7 +31,7 @@ public class ContractController {
         if (response != null) {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Нет данных о контрактах для указанного продукта!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Нет данных о контрактах для продукта в этом периоде!");
         }
     }
 }

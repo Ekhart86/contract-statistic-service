@@ -9,6 +9,8 @@ import ru.ekhart86.contractservice.enums.ErrorMessage;
 import ru.ekhart86.contractservice.model.response.ComparisonResponse;
 import ru.ekhart86.contractservice.services.ContractService;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,14 +39,21 @@ public class CompareFacadeImpl implements CompareFacade {
         ContractResponse fromDateResponse = contractService.findContractsByProduct(productCode, fromPeriod);
         ContractResponse toDateResponse = contractService.findContractsByProduct(productCode, toPeriod);
         if (fromDateResponse != null && toDateResponse != null) {
-            int fromDateNumberOfContracts = fromDateResponse.getContracts().getData().size();
-            int toDateNumberOfContracts = toDateResponse.getContracts().getData().size();
+            int fromPeriodQuantityContracts = fromDateResponse.getContracts().getData().size();
+            int toPeriodQuantityContracts = toDateResponse.getContracts().getData().size();
             long fromDateAmountOfContracts = getAmount(fromDateResponse);
             long toDateAmountOfContracts = getAmount(toDateResponse);
-            var textResult = compareAmount(fromDateAmountOfContracts, toDateAmountOfContracts);
-            return new ComparisonResponse(fromPeriod,
-                    toPeriod, fromDateNumberOfContracts, toDateNumberOfContracts,
-                    fromDateAmountOfContracts, toDateAmountOfContracts, textResult);
+            var resultPercentage = compareAmount(fromDateAmountOfContracts, toDateAmountOfContracts);
+            var resultDescription = "Сумма стоимости контрактов %s на %s%%";
+            if (resultPercentage > 0) {
+                resultDescription = String.format(resultDescription, "увеличилась", resultPercentage);
+            } else {
+                resultDescription = String.format(resultDescription, "уменьшилась", resultPercentage);
+            }
+            String product = productDao.getProductByPartCode(productCode).get(0).getDescription();
+            return new ComparisonResponse(product, fromPeriod,
+                    toPeriod, fromPeriodQuantityContracts, toPeriodQuantityContracts,
+                    fromDateAmountOfContracts, toDateAmountOfContracts, resultDescription, resultPercentage);
         } else {
             return null;
         }
@@ -62,21 +71,13 @@ public class CompareFacadeImpl implements CompareFacade {
         return (int) amount.stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    private String compareAmount(long fromDateAmount, long toDateAmount) {
-        logger.info("Сумма контрактов раньше : " + fromDateAmount);
-        logger.info("Сумма контрактов сейчас : " + toDateAmount);
-        var builder = new StringBuilder();
-        if (fromDateAmount < toDateAmount) {
-            return builder.append("Увеличение общей суммы контрактов на ")
-                    .append((toDateAmount - fromDateAmount) / (toDateAmount / 100))
-                    .append("%, по сравнению с прошлым периодом").toString();
-        } else if (fromDateAmount > toDateAmount) {
-            return builder.append("Уменьшение общей суммы контрактов на ")
-                    .append((fromDateAmount - toDateAmount) / (fromDateAmount / 100))
-                    .append("%, по сравнению с прошлым периодом").toString();
-        } else {
-            return builder.append("Суммы контрактов за выбранные периоды одинаковы").toString();
-        }
+    private Double compareAmount(long fromDateAmount, long toDateAmount) {
+        if (fromDateAmount == toDateAmount) return 0.0;
+        var result = fromDateAmount < toDateAmount ?
+                ((double) toDateAmount - fromDateAmount) / (toDateAmount / 100)
+                : -((double) fromDateAmount - toDateAmount) / (fromDateAmount / 100);
+        BigDecimal bd = new BigDecimal(Double.toString(result));
+        return bd.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     @Override
