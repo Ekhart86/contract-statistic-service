@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.ekhart86.contractservice.dao.ProductDao;
 import ru.ekhart86.contractservice.dto.ContractResponse;
 import ru.ekhart86.contractservice.enums.ErrorMessage;
-import ru.ekhart86.contractservice.model.response.ComparisonResponse;
+import ru.ekhart86.contractservice.model.response.ComparisonProductResponse;
 import ru.ekhart86.contractservice.services.ContractService;
 
 import java.math.BigDecimal;
@@ -35,9 +35,10 @@ public class CompareFacadeImpl implements CompareFacade {
     }
 
     @Override
-    public ComparisonResponse compareByProduct(String productCode, String fromPeriod, String toPeriod) {
+    public ComparisonProductResponse compareByProduct(String productCode, String fromPeriod, String toPeriod) {
         ContractResponse fromDateResponse = contractService.findContractsByProduct(productCode, fromPeriod);
         ContractResponse toDateResponse = contractService.findContractsByProduct(productCode, toPeriod);
+        String productName = productDao.getProductByPartCode(productCode).get(0).getDescription();
         if (fromDateResponse != null && toDateResponse != null) {
             int fromPeriodQuantityContracts = fromDateResponse.getContracts().getData().size();
             int toPeriodQuantityContracts = toDateResponse.getContracts().getData().size();
@@ -47,15 +48,15 @@ public class CompareFacadeImpl implements CompareFacade {
             var resultDescription = "Сумма стоимости контрактов %s на %s%%";
             if (resultPercentage > 0) {
                 resultDescription = String.format(resultDescription, "увеличилась", resultPercentage);
-            } else {
+            } else if (resultPercentage < 0) {
                 resultDescription = String.format(resultDescription, "уменьшилась", resultPercentage);
+            } else {
+                resultDescription = "Сумма стоимости контрактов не изменилась";
             }
-            String product = productDao.getProductByPartCode(productCode).get(0).getDescription();
-            return new ComparisonResponse(product, fromPeriod,
-                    toPeriod, fromPeriodQuantityContracts, toPeriodQuantityContracts,
-                    fromDateAmountOfContracts, toDateAmountOfContracts, resultDescription, resultPercentage);
+            return new ComparisonProductResponse(productCode, productName, fromPeriod, toPeriod, fromPeriodQuantityContracts,
+                    toPeriodQuantityContracts, fromDateAmountOfContracts, toDateAmountOfContracts, resultDescription, resultPercentage);
         } else {
-            return null;
+            return new ComparisonProductResponse("Нет данных о контрактах для продукта '" + productName + " - " + productCode + "' в этом периоде!");
         }
     }
 
