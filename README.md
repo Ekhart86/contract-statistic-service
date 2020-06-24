@@ -1,4 +1,4 @@
-# contract-statistic-service
+# contractDto-statistic-service
 
 Тестовый запрос:
 
