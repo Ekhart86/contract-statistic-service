@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ekhart86.contractservice.domain.EconomicSectorDTO;
 import ru.ekhart86.contractservice.domain.ProductDTO;
-import ru.ekhart86.contractservice.facade.ProductFacade;
-import ru.ekhart86.contractservice.facade.SectorFacade;
+import ru.ekhart86.contractservice.facade.StatisticFacade;
+import ru.ekhart86.contractservice.service.product.ProductServiceImpl;
+import ru.ekhart86.contractservice.service.sector.SectorServiceImpl;
 
 import java.util.List;
 
@@ -19,27 +20,29 @@ import java.util.List;
 @RequestMapping("/api")
 public class InfoController {
 
-    private final SectorFacade sectorFacade;
-    private final ProductFacade productFacade;
+    private final SectorServiceImpl sectorService;
+    private final ProductServiceImpl productService;
+    private final StatisticFacade statisticFacade;
 
-    public InfoController(SectorFacade sectorFacade, ProductFacade productFacade) {
-        this.sectorFacade = sectorFacade;
-        this.productFacade = productFacade;
+    public InfoController(SectorServiceImpl sectorService, ProductServiceImpl productService, StatisticFacade statisticFacade) {
+        this.sectorService = sectorService;
+        this.productService = productService;
+        this.statisticFacade = statisticFacade;
     }
 
     @GetMapping("/economic-sectors")
     public ResponseEntity<List<EconomicSectorDTO>> getEconomicSectors() {
-        return ResponseEntity.status(HttpStatus.OK).body(sectorFacade.getEconomicSectorDTOList());
+        return ResponseEntity.status(HttpStatus.OK).body(sectorService.getEconomicSectorList());
     }
 
     @GetMapping("/products")
     public ResponseEntity<List<ProductDTO>> getProducts() {
-        return ResponseEntity.status(HttpStatus.OK).body(productFacade.getProductDTOList());
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductList());
     }
 
     @GetMapping("/products/{economicCode}")
     public ResponseEntity<List<ProductDTO>> getProducts(@PathVariable String economicCode) {
-        sectorFacade.checkEconomicSector(economicCode);
-        return ResponseEntity.status(HttpStatus.OK).body(productFacade.findProductsByEconomicCode(economicCode.toUpperCase()));
+        statisticFacade.checkEconomicSector(economicCode);
+        return ResponseEntity.status(HttpStatus.OK).body(productService.findProductsByEconomicCode(economicCode));
     }
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface ContractService {
     List<ContractDTO> findBySignDateAndProductCode(Date startDate, Date endDate, String productCode, String currencyCode);
     boolean dateExist(Date date);
+    boolean currencyExist(String currency);
 }

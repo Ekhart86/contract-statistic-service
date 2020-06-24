@@ -4,6 +4,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,22 +18,36 @@ import java.util.stream.Collectors;
 public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalEconomicSectorException.class)
-    protected ResponseEntity<ApiError> handleEconomicSectorException(IllegalEconomicSectorException exception) {
+    protected ResponseEntity<ApiError> handleIllegalEconomicSectorException(IllegalEconomicSectorException exception) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DateNotExistException.class)
-    protected ResponseEntity<ApiError> handleEconomicSectorException(DateNotExistException exception) {
+    protected ResponseEntity<ApiError> handleDateNotExistException(DateNotExistException exception) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DateOrderException.class)
-    protected ResponseEntity<ApiError> handleEconomicSectorException(DateOrderException exception) {
+    protected ResponseEntity<ApiError> handleDateOrderException(DateOrderException exception) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CurrencyNotExistException.class)
+    protected ResponseEntity<ApiError> handleCurrencyNotExistException(CurrencyNotExistException exception) {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return new ResponseEntity<>(new ApiError(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
         List<String> errorList = ex
                 .getBindingResult()
                 .getFieldErrors()

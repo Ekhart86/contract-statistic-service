@@ -1,11 +1,11 @@
 package ru.ekhart86.contractservice.service.product;
 
-import ru.ekhart86.contractservice.entity.Product;
+import ru.ekhart86.contractservice.domain.ProductDTO;
 
 import java.util.List;
 
 public interface ProductService {
-    List<Product> getProductList();
+    List<ProductDTO> getProductList();
 
-    List<Product> findProductsByEconomicCode(String economicCode);
+    List<ProductDTO> findProductsByEconomicCode(String economicCode);
 }

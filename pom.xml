@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.ekhart86</groupId>
-	<artifactId>economic-statistic-service</artifactId>
+	<artifactId>spending-statistic-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>economic-statistic-service</name>
+	<name>spending-statistic-service</name>
 	<description>Service showing economic statistic</description>
 
 	<properties>

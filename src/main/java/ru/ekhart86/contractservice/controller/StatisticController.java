@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.ekhart86.contractservice.domain.SectorStatisticRequestDTO;
 import ru.ekhart86.contractservice.domain.SectorStatisticResponseDTO;
-import ru.ekhart86.contractservice.facade.DateVerificationFacade;
-import ru.ekhart86.contractservice.facade.SectorFacade;
 import ru.ekhart86.contractservice.facade.StatisticFacade;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 
 @Slf4j
 @RestController
@@ -21,26 +20,24 @@ import javax.validation.Valid;
 public class StatisticController {
 
     private final StatisticFacade statisticFacade;
-    private final SectorFacade sectorFacade;
-    private final DateVerificationFacade dateVerificationFacade;
 
-    public StatisticController(StatisticFacade statisticFacade, SectorFacade sectorFacade, DateVerificationFacade dateVerificationFacade) {
+    public StatisticController(StatisticFacade statisticFacade) {
         this.statisticFacade = statisticFacade;
-        this.sectorFacade = sectorFacade;
-        this.dateVerificationFacade = dateVerificationFacade;
     }
 
     @PostMapping("/sector-statistic")
     public ResponseEntity<SectorStatisticResponseDTO> getSectorStatistic(@RequestBody @Valid SectorStatisticRequestDTO request) {
         var startDate = request.getStartDate();
+        System.out.println(startDate);
         var endDate = request.getEndDate();
+        System.out.println(endDate);
         var economicCode = request.getEconomicCode();
         var currencyCode = request.getCurrencyCode();
-        dateVerificationFacade.checkDateInDataBase(startDate, endDate);
-        dateVerificationFacade.startOlderThanEnd(startDate, endDate);
-        sectorFacade.checkEconomicSector(economicCode);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(statisticFacade.getStatisticByEconomicCode(startDate, endDate, economicCode, currencyCode));
+        statisticFacade.checkDateInDataBase(Arrays.asList(startDate, endDate));
+        statisticFacade.startOlderThanEnd(startDate, endDate);
+        statisticFacade.checkEconomicSector(economicCode);
+        statisticFacade.checkCurrencyCode(currencyCode);
+        return ResponseEntity.status(HttpStatus.OK).body(statisticFacade.getStatisticByEconomicCode(startDate, endDate, economicCode, currencyCode));
     }
 
 }

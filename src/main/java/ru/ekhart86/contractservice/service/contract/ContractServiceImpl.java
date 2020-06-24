@@ -34,4 +34,9 @@ public class ContractServiceImpl implements ContractService {
         return contractRepository.findBySignDate(date).size() > 0;
     }
 
+    @Override
+    public boolean currencyExist(String currency) {
+        return contractRepository.findByCurrencyCode(currency).size() > 0;
+    }
+
 }
