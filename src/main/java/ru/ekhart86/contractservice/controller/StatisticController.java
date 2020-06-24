@@ -28,9 +28,7 @@ public class StatisticController {
     @PostMapping("/sector-statistic")
     public ResponseEntity<SectorStatisticResponseDTO> getSectorStatistic(@RequestBody @Valid SectorStatisticRequestDTO request) {
         var startDate = request.getStartDate();
-        System.out.println(startDate);
         var endDate = request.getEndDate();
-        System.out.println(endDate);
         var economicCode = request.getEconomicCode();
         var currencyCode = request.getCurrencyCode();
         statisticFacade.checkDateInDataBase(Arrays.asList(startDate, endDate));
