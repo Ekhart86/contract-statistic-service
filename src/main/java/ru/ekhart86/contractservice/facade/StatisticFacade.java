@@ -112,13 +112,14 @@ public class StatisticFacade {
 
     private Double getComparePercentage(long fromDateAmount, long toDateAmount) {
         if (fromDateAmount == toDateAmount) return 0.0;
+        if (fromDateAmount == 0.0) return 100.0;
+        if (toDateAmount == 0.0) return -100.0;
         var result = fromDateAmount < toDateAmount ?
-                ((double) toDateAmount - fromDateAmount) / (toDateAmount / 100)
-                : -((double) fromDateAmount - toDateAmount) / (fromDateAmount / 100);
+                ((double) toDateAmount - fromDateAmount) / ((double) toDateAmount / 100)
+                : -((double) fromDateAmount - toDateAmount) / ((double) fromDateAmount / 100);
         BigDecimal bd = new BigDecimal(Double.toString(result));
         return bd.setScale(1, RoundingMode.HALF_UP).doubleValue();
     }
-
 
     public void checkEconomicSector(String sectorCode) {
         if (!economicSectorService.economicSectorExist(sectorCode.toUpperCase())) {
