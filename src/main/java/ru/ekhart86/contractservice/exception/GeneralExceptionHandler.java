@@ -37,6 +37,14 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MaximumPeriodDateException.class)
+    protected ResponseEntity<ApiError> handleMaximumPeriodDateException(MaximumPeriodDateException exception) {
+        return new ResponseEntity<>(new ApiError(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Error thrown during validation of hibernate api handler
+     */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return new ResponseEntity<>(new ApiError(ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);

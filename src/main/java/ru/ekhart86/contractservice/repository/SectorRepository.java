@@ -11,7 +11,5 @@ public interface SectorRepository extends CrudRepository<EconomicSector, Long> {
 
     @Override
     List<EconomicSector> findAll();
-
     List<EconomicSector> findByCode(String economicCode);
-
 }

@@ -13,9 +13,6 @@ public interface ContractRepository extends CrudRepository<Contract, Long> {
 
     @Query("SELECT c FROM Contract c WHERE c.productCode = ?3 AND c.currencyCode = ?4 AND c.signDate BETWEEN ?1 AND ?2")
     List<Contract> findBySignDateAndProductCode(Date startDate, Date endDate, String productCode, String currencyCode);
-
     List<Contract> findBySignDate(Date date);
-
     List<Contract> findByCurrencyCode(String code);
-
 }

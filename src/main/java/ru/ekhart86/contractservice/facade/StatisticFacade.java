@@ -3,18 +3,18 @@ package ru.ekhart86.contractservice.facade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.ekhart86.contractservice.domain.CompareSectorResponseDTO;
 import ru.ekhart86.contractservice.domain.ContractDTO;
 import ru.ekhart86.contractservice.domain.ProductDTO;
 import ru.ekhart86.contractservice.domain.SectorStatisticResponseDTO;
-import ru.ekhart86.contractservice.exception.CurrencyNotExistException;
-import ru.ekhart86.contractservice.exception.DateNotExistException;
-import ru.ekhart86.contractservice.exception.DateOrderException;
-import ru.ekhart86.contractservice.exception.IllegalEconomicSectorException;
+import ru.ekhart86.contractservice.exception.*;
 import ru.ekhart86.contractservice.service.contract.ContractServiceImpl;
 import ru.ekhart86.contractservice.service.product.ProductServiceImpl;
 import ru.ekhart86.contractservice.service.sector.SectorServiceImpl;
 import ru.ekhart86.contractservice.util.DateValidator;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
@@ -43,21 +43,82 @@ public class StatisticFacade {
      * The method returns a statistics report about number of contracts concluded,
      * their amount, for the specified period in the specified economic code and currency
      */
-    public SectorStatisticResponseDTO getStatisticByEconomicCode(Date startDate, Date endDate, String economicCode, String currencyCode) {
-        var listProductCode = productService.findProductsByEconomicCode(economicCode)
-                .stream()
-                .map(ProductDTO::getCode)
-                .collect(Collectors.toList());
-        List<ContractDTO> listContractDTO = listProductCode
-                .stream()
-                .map(productCode -> contractService.findBySignDateAndProductCode(startDate, endDate, productCode, currencyCode))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+    public SectorStatisticResponseDTO getStatisticByEconomicCode(Date startDate,
+                                                                 Date endDate,
+                                                                 String economicCode,
+                                                                 String currencyCode) {
+        var listProductCode = getListProductByCode(economicCode);
+        List<ContractDTO> listContractDTO = getListContractByDateAndProductCode(listProductCode, startDate, endDate, currencyCode);
         var quantityContracts = listContractDTO.size();
         var totalAmount = listContractDTO.stream().mapToLong(ContractDTO::getAmount).sum();
         var economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
-        return new SectorStatisticResponseDTO(economicCode, economicSectorDescription, startDate, endDate, quantityContracts, totalAmount, currencyCode);
+        return new SectorStatisticResponseDTO(economicCode,
+                economicSectorDescription,
+                startDate,
+                endDate,
+                quantityContracts,
+                totalAmount,
+                currencyCode);
     }
+
+
+    public CompareSectorResponseDTO compareEconomicSector(Date startFromPeriod,
+                                                          Date endFromPeriod,
+                                                          Date startToPeriod,
+                                                          Date endToPeriod,
+                                                          String economicCode,
+                                                          String currencyCode) {
+        var listProduct = getListProductByCode(economicCode);
+        var listFromPeriodContracts = getListContractByDateAndProductCode(listProduct, startFromPeriod, endFromPeriod, currencyCode);
+        var listToPeriodContracts = getListContractByDateAndProductCode(listProduct, startToPeriod, endToPeriod, currencyCode);
+        var quantityFromContracts = listFromPeriodContracts.size();
+        var quantityToContracts = listToPeriodContracts.size();
+        var totalFromAmount = listFromPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
+        var totalToAmount = listToPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
+        var economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
+        var contractPercentage = getComparePercentage(quantityFromContracts, quantityToContracts);
+        var amountPercentage = getComparePercentage(totalFromAmount, totalToAmount);
+        return new CompareSectorResponseDTO(
+                economicSectorDescription,
+                economicCode,
+                startFromPeriod,
+                endFromPeriod,
+                startToPeriod,
+                endToPeriod,
+                currencyCode,
+                quantityFromContracts,
+                totalFromAmount,
+                quantityToContracts,
+                totalToAmount,
+                contractPercentage,
+                amountPercentage);
+    }
+
+
+    private List<String> getListProductByCode(String economicCode) {
+        return productService.findProductsByEconomicCode(economicCode)
+                .stream()
+                .map(ProductDTO::getCode)
+                .collect(Collectors.toList());
+    }
+
+    private List<ContractDTO> getListContractByDateAndProductCode(List<String> productCodeList, Date startPeriod, Date endPeriod, String currencyCode) {
+        return productCodeList
+                .stream()
+                .map(productCode -> contractService.findBySignDateAndProductCode(startPeriod, endPeriod, productCode, currencyCode))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    private Double getComparePercentage(long fromDateAmount, long toDateAmount) {
+        if (fromDateAmount == toDateAmount) return 0.0;
+        var result = fromDateAmount < toDateAmount ?
+                ((double) toDateAmount - fromDateAmount) / (toDateAmount / 100)
+                : -((double) fromDateAmount - toDateAmount) / (fromDateAmount / 100);
+        BigDecimal bd = new BigDecimal(Double.toString(result));
+        return bd.setScale(1, RoundingMode.HALF_UP).doubleValue();
+    }
+
 
     public void checkEconomicSector(String sectorCode) {
         if (!economicSectorService.economicSectorExist(sectorCode.toUpperCase())) {
@@ -75,10 +136,16 @@ public class StatisticFacade {
         });
     }
 
-    public void startOlderThanEnd(Date startDate, Date endDate) {
+    public void startIsBeforeEnd(Date startDate, Date endDate) {
         if (!dateValidator.startOlderThanEnd(startDate, endDate)) {
             logger.info("Period start date must be earlier than period end date : startDate = " + startDate + " and endDate = " + endDate);
             throw new DateOrderException("startDate = " + startDate + " and endDate = " + endDate);
+        }
+    }
+
+    public void periodIsValid(Date startDate, Date endDate) {
+        if (startDate.toLocalDate().plusMonths(1).isBefore(endDate.toLocalDate())) {
+            throw new MaximumPeriodDateException();
         }
     }
 
