@@ -87,8 +87,8 @@ public class StatisticFacade {
                 endToPeriod,
                 currencyCode,
                 quantityFromContracts,
-                totalFromAmount,
                 quantityToContracts,
+                totalFromAmount,
                 totalToAmount,
                 contractPercentage,
                 amountPercentage);

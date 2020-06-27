@@ -16,8 +16,8 @@ public class CompareSectorResponseDTO {
     private Date endToPeriod;
     private String currencyCode;
     private Integer fromPeriodQuantityContracts;
-    private Long fromAmount;
     private Integer toPeriodQuantityContracts;
+    private Long fromAmount;
     private Long toAmount;
     private Double contractPercentage;
     private Double amountPercentage;
