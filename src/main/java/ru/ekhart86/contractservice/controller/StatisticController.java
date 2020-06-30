@@ -11,9 +11,9 @@ import ru.ekhart86.contractservice.domain.*;
 import ru.ekhart86.contractservice.facade.StatisticFacade;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -60,36 +60,34 @@ public class StatisticController {
         statisticFacade.periodIsValid(startToPeriod, endToPeriod);
         statisticFacade.checkEconomicSector(economicCode);
         statisticFacade.checkCurrencyCode(currencyCode);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(statisticFacade.compareEconomicSector(startFromPeriod,
-                            endFromPeriod,
-                            startToPeriod,
-                            endToPeriod,
-                            economicCode,
-                            currencyCode));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(statisticFacade.compareEconomicSector(startFromPeriod,
+                        endFromPeriod,
+                        startToPeriod,
+                        endToPeriod,
+                        economicCode,
+                        currencyCode));
     }
 
     @PostMapping("/compare-all-economic-sector")
-    public ResponseEntity<List<CompareSectorResponseDTO>> compareAllEconomicSector(@RequestBody @Valid CompareSectorRequestDTO compareRequest) {
+    public ResponseEntity<List<CompareSectorResponseDTO>> compareAllEconomicSector(@RequestBody @Valid CompareAllSectorRequestDTO compareRequest) {
         var currencyCode = compareRequest.getCurrencyCode();
         var startFromPeriod = compareRequest.getStartFromPeriod();
         var endFromPeriod = compareRequest.getEndFromPeriod();
         var startToPeriod = compareRequest.getStartToPeriod();
         var endToPeriod = compareRequest.getEndToPeriod();
-        var economicSectorList = statisticFacade.getAllEconomicSectors();
-        List<CompareSectorResponseDTO> responseEntityList = new ArrayList<>();
-        for (EconomicSectorDTO sector : economicSectorList) {
-            String code = sector.getCode();
-            responseEntityList.add(statisticFacade.compareEconomicSector(startFromPeriod,
-                    endFromPeriod,
-                    startToPeriod,
-                    endToPeriod,
-                    code,
-                    currencyCode));
-
-        }
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(responseEntityList);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(statisticFacade.getAllEconomicSectors()
+                        .stream()
+                        .map(sector -> statisticFacade.compareEconomicSector(
+                                startFromPeriod,
+                                endFromPeriod,
+                                startToPeriod,
+                                endToPeriod,
+                                sector.getCode(),
+                                currencyCode))
+                        .collect(Collectors.toList()));
     }
 
 }

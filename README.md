@@ -10,6 +10,7 @@ GET: /api/products/{economicCode}
 
 GET: /api/products 
 
+
 POST /api/sector-statistic 
 
 
@@ -23,7 +24,12 @@ Test Request body:
    "currencyCode" : "RUB"
 }
 
+
 POST: /api/compare-economic-sector
+
+
+Test Request body:
+
 
    { 
    "startFromPeriod" : "2019-04-01",
@@ -34,7 +40,23 @@ POST: /api/compare-economic-sector
    "currencyCode" : "RUB"
    }
 
+
+POST: /api/compare-all-economic-sector
+
+
+   { 
+   "startFromPeriod" : "2019-04-01",
+   "endFromPeriod" : "2019-05-01",
+   "startToPeriod" : "2020-04-01",
+   "endToPeriod" : "2020-05-01",
+   "economicCode" : "D",
+   "currencyCode" : "RUB"
+   }
+
+
+
 Можно посмотреть запросы в Swagger:
+
 
 http://localhost:8080/swagger-ui-custom.html
 
