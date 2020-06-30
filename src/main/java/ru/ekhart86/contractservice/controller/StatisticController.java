@@ -76,6 +76,13 @@ public class StatisticController {
         var endFromPeriod = compareRequest.getEndFromPeriod();
         var startToPeriod = compareRequest.getStartToPeriod();
         var endToPeriod = compareRequest.getEndToPeriod();
+        statisticFacade.checkDateInDataBase(Arrays.asList(startFromPeriod, endFromPeriod, startToPeriod, endToPeriod));
+        statisticFacade.periodIsValid(startFromPeriod, endFromPeriod);
+        statisticFacade.startIsBeforeEnd(startFromPeriod, endFromPeriod);
+        statisticFacade.startIsBeforeEnd(endFromPeriod, startToPeriod);
+        statisticFacade.startIsBeforeEnd(startToPeriod, endToPeriod);
+        statisticFacade.periodIsValid(startToPeriod, endToPeriod);
+        statisticFacade.checkCurrencyCode(currencyCode);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(statisticFacade.getAllEconomicSectors()
