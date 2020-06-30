@@ -3,10 +3,8 @@ package ru.ekhart86.contractservice.facade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import ru.ekhart86.contractservice.domain.CompareSectorResponseDTO;
-import ru.ekhart86.contractservice.domain.ContractDTO;
-import ru.ekhart86.contractservice.domain.ProductDTO;
-import ru.ekhart86.contractservice.domain.SectorStatisticResponseDTO;
+import ru.ekhart86.contractservice.domain.*;
+import ru.ekhart86.contractservice.entity.EconomicSector;
 import ru.ekhart86.contractservice.exception.*;
 import ru.ekhart86.contractservice.service.contract.ContractServiceImpl;
 import ru.ekhart86.contractservice.service.product.ProductServiceImpl;
@@ -94,6 +92,9 @@ public class StatisticFacade {
                 amountPercentage);
     }
 
+    public List<EconomicSectorDTO> getAllEconomicSectors() {
+        return economicSectorService.getEconomicSectorList();
+    }
 
     private List<String> getListProductByCode(String economicCode) {
         return productService.findProductsByEconomicCode(economicCode)
@@ -103,11 +104,12 @@ public class StatisticFacade {
     }
 
     private List<ContractDTO> getListContractByDateAndProductCode(List<String> productCodeList, Date startPeriod, Date endPeriod, String currencyCode) {
-        return productCodeList
+        return contractService.findBySignDateAndProductCode(startPeriod, endPeriod, productCodeList, currencyCode);
+        /*return productCodeList
                 .stream()
                 .map(productCode -> contractService.findBySignDateAndProductCode(startPeriod, endPeriod, productCode, currencyCode))
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
     }
 
     private Double getComparePercentage(long fromDateAmount, long toDateAmount) {
