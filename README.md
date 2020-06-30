@@ -49,7 +49,6 @@ POST: /api/compare-all-economic-sector
    "endFromPeriod" : "2019-05-01",
    "startToPeriod" : "2020-04-01",
    "endToPeriod" : "2020-05-01",
-   "economicCode" : "D",
    "currencyCode" : "RUB"
    }
 
