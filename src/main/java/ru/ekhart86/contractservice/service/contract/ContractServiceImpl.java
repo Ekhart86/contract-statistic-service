@@ -28,6 +28,17 @@ public class ContractServiceImpl implements ContractService {
                         contract.getCurrencyCode()))
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<ContractDTO> findBySignDateAndProductCode(Date startDate, Date endDate, List<String> productCode, String currencyCode) {
+        return contractRepository.findBySignDateAndListOfProductCode(startDate, endDate, productCode, currencyCode).stream().map(contract ->
+                new ContractDTO(
+                        contract.getProductCode(),
+                        contract.getRegionCode(),
+                        contract.getSignDate(),
+                        contract.getAmount(),
+                        contract.getCurrencyCode()))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public boolean dateExist(Date date) {
