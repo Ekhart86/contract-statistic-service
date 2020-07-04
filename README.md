@@ -1,4 +1,10 @@
-#economic-statistic-service
+#contract-statistic-service
+
+
+Микросервис отображает статистику по секторам экономики за выбранные периоды. Для сравнения используется количество контрактов и их суммарная стоимость за выбранный период.
+
+Доступные периоды с июня 2018 по июнь 2020.
+
 
 Реализованные запросы:
 
@@ -44,6 +50,9 @@ Test Request body:
 POST: /api/compare-all-economic-sector
 
 
+Test Request body:
+
+
    { 
    "startFromPeriod" : "2019-04-01",
    "endFromPeriod" : "2019-05-01",
@@ -54,7 +63,7 @@ POST: /api/compare-all-economic-sector
 
 
 
-Можно посмотреть запросы в Swagger:  /swagger-ui.html
+Есть возможнось посмотреть запросы в Swagger:
 
 
  
