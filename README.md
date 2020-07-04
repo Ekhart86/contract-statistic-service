@@ -63,7 +63,7 @@ Test Request body:
 
 
 
-Есть возможнось посмотреть запросы в Swagger:
+Есть возможнось посмотреть запросы в Swagger: /swagger-ui.html
 
 
  
