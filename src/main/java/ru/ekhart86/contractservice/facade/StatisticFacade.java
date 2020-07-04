@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.ekhart86.contractservice.domain.*;
-import ru.ekhart86.contractservice.entity.EconomicSector;
 import ru.ekhart86.contractservice.exception.*;
 import ru.ekhart86.contractservice.service.contract.ContractServiceImpl;
 import ru.ekhart86.contractservice.service.product.ProductServiceImpl;
@@ -14,7 +13,6 @@ import ru.ekhart86.contractservice.util.DateValidator;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,11 +103,6 @@ public class StatisticFacade {
 
     private List<ContractDTO> getListContractByDateAndProductCode(List<String> productCodeList, Date startPeriod, Date endPeriod, String currencyCode) {
         return contractService.findBySignDateAndProductCode(startPeriod, endPeriod, productCodeList, currencyCode);
-        /*return productCodeList
-                .stream()
-                .map(productCode -> contractService.findBySignDateAndProductCode(startPeriod, endPeriod, productCode, currencyCode))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());*/
     }
 
     private Double getComparePercentage(long fromDateAmount, long toDateAmount) {

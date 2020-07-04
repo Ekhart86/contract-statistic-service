@@ -54,8 +54,8 @@ POST: /api/compare-all-economic-sector
 
 
 
-Можно посмотреть запросы в Swagger:
+Можно посмотреть запросы в Swagger:  /swagger-ui.html
 
 
-http://localhost:8080/swagger-ui-custom.html
+ 
 
