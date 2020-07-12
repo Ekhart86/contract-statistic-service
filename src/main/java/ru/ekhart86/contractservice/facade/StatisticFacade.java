@@ -3,12 +3,14 @@ package ru.ekhart86.contractservice.facade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.ekhart86.contractservice.domain.*;
 import ru.ekhart86.contractservice.exception.*;
 import ru.ekhart86.contractservice.service.contract.ContractServiceImpl;
 import ru.ekhart86.contractservice.service.product.ProductServiceImpl;
 import ru.ekhart86.contractservice.service.sector.SectorServiceImpl;
 import ru.ekhart86.contractservice.util.DateValidator;
+
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class StatisticFacade {
 
     private final Logger logger = LoggerFactory.getLogger(StatisticFacade.class);
