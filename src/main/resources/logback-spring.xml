@@ -1,0 +1,77 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>./logs/contract-spending.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="elk-requests" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>185.241.192.176:5010</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc/>
+                <context/>
+                <version/>
+                <logLevel/>
+                <loggerName/>
+                <threadName/>
+                <provider class="ru.ekhart86.contractservice.util.RequestLoggerJsonProvider"/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                        "application": "contract-spending",
+                        "appender": "requests"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+    <appender name="elk-errors" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <destination>185.241.192.176:5010</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc/>
+                <context/>
+                <version/>
+                <logLevel/>
+                <loggerName/>
+                <threadName/>
+                <message/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                        "application": "contract-spending",
+                        "appender": "errors"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+    <logger name="ru.ekhart86.contractservice" level="ERROR">
+        <appender-ref ref="elk-errors"/>
+    </logger>
+    <logger name="ru.ekhart86.contractservice" level="INFO">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
