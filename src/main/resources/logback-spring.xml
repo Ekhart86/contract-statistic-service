@@ -70,6 +70,9 @@
     <logger name="ru.ekhart86.contractservice" level="INFO">
         <appender-ref ref="FILE"/>
     </logger>
+    <root level="ERROR">
+        <appender-ref ref="elk-errors"/>
+    </root>
     <root level="INFO">
         <appender-ref ref="FILE"/>
     </root>
