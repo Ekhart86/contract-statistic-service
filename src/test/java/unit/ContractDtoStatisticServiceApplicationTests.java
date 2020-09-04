@@ -1,4 +1,4 @@
-package ru.ekhart86.contractservice;
+package unit;
 
 import org.springframework.boot.test.context.SpringBootTest;
 

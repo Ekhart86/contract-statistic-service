@@ -11,6 +11,7 @@ import ru.ekhart86.contractservice.domain.*;
 import ru.ekhart86.contractservice.facade.StatisticFacade;
 
 import javax.validation.Valid;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,30 +29,27 @@ public class StatisticController {
 
     @PostMapping("/sector-statistic")
     public ResponseEntity<SectorStatisticResponseDTO> getSectorStatistic(@RequestBody @Valid SectorStatisticRequestDTO request) {
-        var startDate = request.getStartDate();
-        var endDate = request.getEndDate();
-        var economicCode = request.getEconomicCode();
-        var currencyCode = request.getCurrencyCode();
+        Date startDate = request.getStartDate();
+        Date endDate = request.getEndDate();
+        String economicCode = request.getEconomicCode();
+        String currencyCode = request.getCurrencyCode();
         statisticFacade.checkDateInDataBase(Arrays.asList(startDate, endDate));
         statisticFacade.startIsBeforeEnd(startDate, endDate);
         statisticFacade.periodIsValid(startDate, endDate);
         statisticFacade.checkEconomicSector(economicCode);
         statisticFacade.checkCurrencyCode(currencyCode);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(statisticFacade.getStatisticByEconomicCode(startDate,
-                        endDate,
-                        economicCode,
-                        currencyCode));
+                .body(statisticFacade.getStatisticByEconomicCode(startDate, endDate, economicCode, currencyCode));
     }
 
     @PostMapping("/compare-economic-sector")
     public ResponseEntity<CompareSectorResponseDTO> compareEconomicSector(@RequestBody @Valid CompareSectorRequestDTO compareRequest) {
-        var currencyCode = compareRequest.getCurrencyCode();
-        var economicCode = compareRequest.getEconomicCode();
-        var startFromPeriod = compareRequest.getStartFromPeriod();
-        var endFromPeriod = compareRequest.getEndFromPeriod();
-        var startToPeriod = compareRequest.getStartToPeriod();
-        var endToPeriod = compareRequest.getEndToPeriod();
+        String currencyCode = compareRequest.getCurrencyCode();
+        String economicCode = compareRequest.getEconomicCode();
+        Date startFromPeriod = compareRequest.getStartFromPeriod();
+        Date endFromPeriod = compareRequest.getEndFromPeriod();
+        Date startToPeriod = compareRequest.getStartToPeriod();
+        Date endToPeriod = compareRequest.getEndToPeriod();
         statisticFacade.checkDateInDataBase(Arrays.asList(startFromPeriod, endFromPeriod, startToPeriod, endToPeriod));
         statisticFacade.startIsBeforeEnd(startFromPeriod, endFromPeriod);
         statisticFacade.periodIsValid(startFromPeriod, endFromPeriod);
@@ -61,21 +59,16 @@ public class StatisticController {
         statisticFacade.checkEconomicSector(economicCode);
         statisticFacade.checkCurrencyCode(currencyCode);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(statisticFacade.compareEconomicSector(startFromPeriod,
-                        endFromPeriod,
-                        startToPeriod,
-                        endToPeriod,
-                        economicCode,
-                        currencyCode));
+                .body(statisticFacade.compareEconomicSector(startFromPeriod, endFromPeriod, startToPeriod, endToPeriod, economicCode, currencyCode));
     }
 
     @PostMapping("/compare-all-economic-sector")
     public ResponseEntity<List<CompareSectorResponseDTO>> compareAllEconomicSector(@RequestBody @Valid CompareAllSectorRequestDTO compareRequest) {
-        var currencyCode = compareRequest.getCurrencyCode();
-        var startFromPeriod = compareRequest.getStartFromPeriod();
-        var endFromPeriod = compareRequest.getEndFromPeriod();
-        var startToPeriod = compareRequest.getStartToPeriod();
-        var endToPeriod = compareRequest.getEndToPeriod();
+        String currencyCode = compareRequest.getCurrencyCode();
+        Date startFromPeriod = compareRequest.getStartFromPeriod();
+        Date endFromPeriod = compareRequest.getEndFromPeriod();
+        Date startToPeriod = compareRequest.getStartToPeriod();
+        Date endToPeriod = compareRequest.getEndToPeriod();
         statisticFacade.checkDateInDataBase(Arrays.asList(startFromPeriod, endFromPeriod, startToPeriod, endToPeriod));
         statisticFacade.periodIsValid(startFromPeriod, endFromPeriod);
         statisticFacade.startIsBeforeEnd(startFromPeriod, endFromPeriod);

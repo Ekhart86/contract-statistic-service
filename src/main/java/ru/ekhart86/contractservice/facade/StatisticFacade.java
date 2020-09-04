@@ -46,11 +46,11 @@ public class StatisticFacade {
                                                                  Date endDate,
                                                                  String economicCode,
                                                                  String currencyCode) {
-        var listProductCode = getListProductByCode(economicCode);
+        List<String> listProductCode = getListProductByCode(economicCode);
         List<ContractDTO> listContractDTO = getListContractByDateAndProductCode(listProductCode, startDate, endDate, currencyCode);
-        var quantityContracts = listContractDTO.size();
-        var totalAmount = listContractDTO.stream().mapToLong(ContractDTO::getAmount).sum();
-        var economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
+        int quantityContracts = listContractDTO.size();
+        long totalAmount = listContractDTO.stream().mapToLong(ContractDTO::getAmount).sum();
+        String economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
         return new SectorStatisticResponseDTO(economicCode,
                 economicSectorDescription,
                 startDate,
@@ -67,16 +67,16 @@ public class StatisticFacade {
                                                           Date endToPeriod,
                                                           String economicCode,
                                                           String currencyCode) {
-        var listProduct = getListProductByCode(economicCode);
-        var listFromPeriodContracts = getListContractByDateAndProductCode(listProduct, startFromPeriod, endFromPeriod, currencyCode);
-        var listToPeriodContracts = getListContractByDateAndProductCode(listProduct, startToPeriod, endToPeriod, currencyCode);
-        var quantityFromContracts = listFromPeriodContracts.size();
-        var quantityToContracts = listToPeriodContracts.size();
-        var totalFromAmount = listFromPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
-        var totalToAmount = listToPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
-        var economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
-        var contractPercentage = getComparePercentage(quantityFromContracts, quantityToContracts);
-        var amountPercentage = getComparePercentage(totalFromAmount, totalToAmount);
+        List<String> listProduct = getListProductByCode(economicCode);
+        List<ContractDTO> listFromPeriodContracts = getListContractByDateAndProductCode(listProduct, startFromPeriod, endFromPeriod, currencyCode);
+        List<ContractDTO> listToPeriodContracts = getListContractByDateAndProductCode(listProduct, startToPeriod, endToPeriod, currencyCode);
+        int quantityFromContracts = listFromPeriodContracts.size();
+        int quantityToContracts = listToPeriodContracts.size();
+        long totalFromAmount = listFromPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
+        long totalToAmount = listToPeriodContracts.stream().mapToLong(ContractDTO::getAmount).sum();
+        String economicSectorDescription = economicSectorService.getEconomicSectorDescription(economicCode);
+        Double contractPercentage = getComparePercentage(quantityFromContracts, quantityToContracts);
+        Double amountPercentage = getComparePercentage(totalFromAmount, totalToAmount);
         return new CompareSectorResponseDTO(
                 economicSectorDescription,
                 economicCode,
@@ -112,7 +112,7 @@ public class StatisticFacade {
         if (fromDateAmount == toDateAmount) return 0.0;
         if (fromDateAmount == 0.0) return 100.0;
         if (toDateAmount == 0.0) return -100.0;
-        var result = fromDateAmount < toDateAmount ?
+        double result = fromDateAmount < toDateAmount ?
                 ((double) toDateAmount - fromDateAmount) / ((double) toDateAmount / 100)
                 : -((double) fromDateAmount - toDateAmount) / ((double) fromDateAmount / 100);
         BigDecimal bd = new BigDecimal(Double.toString(result));
